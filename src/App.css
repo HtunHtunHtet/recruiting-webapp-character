@@ -30,6 +30,7 @@
   flex: 1 1 0;
   background-color: hsl(220deg 13% 13%);
   color: white;
+  border: 1px solid #ffffff;
 }
 
 .App-link {
