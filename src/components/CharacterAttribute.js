@@ -5,8 +5,6 @@ export default function CharacterAttribute({ characterIndex, attributeName, attr
     const modifier = calculateModifier(attributeValue);
 
     const handleIncrease = () => {
-        console.log('calculateTotalAttributes', calculateTotalAttributes());
-
         if (calculateTotalAttributes(characterIndex) < 70) {
             onAttributeChange(characterIndex, attributeName, attributeValue + 1);
         } else {

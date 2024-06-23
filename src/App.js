@@ -12,8 +12,6 @@ function App() {
         ATTRIBUTE_LIST.reduce((attributes, attribute) => ({...attributes, [attribute]: 10 }), {})
     );
 
-    console.log('SKILL_LIST[0].name', SKILL_LIST[0].name);
-
     /** Multiple Characters **/
     const [characters, setCharacters] = useState([
         {
@@ -52,10 +50,6 @@ function App() {
         return 0;
     };
 
-    const [skillPoints, setSkillPoints]   = useState(
-        SKILL_LIST.reduce((skills, skill) => ({...skills, [skill.name]: 0 }), {})
-    )
-
     const handleIncrease = (characterIndex, skillName) => {
         setCharacters(prev => {
             const newCharacters = [...prev];
@@ -80,10 +74,6 @@ function App() {
     const [showSelectedClass, setShowSelectedClass] = useState(true);
     const intelligenceModifier = calculateModifier(characterAttributes['Intelligence']);
     const totalSkillPoints = 10 + (4 * intelligenceModifier);
-    const [selectedSkill, setSelectedSkill] = useState(SKILL_LIST[0].name);
-    const [dcValue, setDcValue] = useState(0);
-    const [rolledNumber, setRolledNumber] = useState(0);
-    const [result, setResult] = useState('');
 
     const handleSkillCheck = (characterIndex) => {
         const randomNumber = Math.floor(Math.random() * 20) + 1;
