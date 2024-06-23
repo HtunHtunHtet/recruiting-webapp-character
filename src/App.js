@@ -12,11 +12,17 @@ function App() {
         ATTRIBUTE_LIST.reduce((attributes, attribute) => ({...attributes, [attribute]: 10 }), {})
     );
 
+    console.log('SKILL_LIST[0].name', SKILL_LIST[0].name);
+
     /** Multiple Characters **/
     const [characters, setCharacters] = useState([
         {
             attributes: ATTRIBUTE_LIST.reduce((attributes, attribute) => ({...attributes, [attribute]: 10 }), {}),
-            skillPoints: SKILL_LIST.reduce((skills, skill) => ({...skills, [skill.name]: 0 }), {})
+            skillPoints: SKILL_LIST.reduce((skills, skill) => ({...skills, [skill.name]: 0 }), {}),
+            selectedSkill: "",
+            dcValue: 0,
+            rolledNumber: 0,
+            result: ''
         }
     ]);
 
@@ -50,12 +56,6 @@ function App() {
         SKILL_LIST.reduce((skills, skill) => ({...skills, [skill.name]: 0 }), {})
     )
 
-    const [selectedClass, setSelectedClass] = useState(null);
-    const [showSelectedClass, setShowSelectedClass] = useState(true);
-    const intelligenceModifier = calculateModifier(characterAttributes['Intelligence']);
-    const totalSkillPoints = 10 + (4 * intelligenceModifier);
-
-
     const handleIncrease = (characterIndex, skillName) => {
         setCharacters(prev => {
             const newCharacters = [...prev];
@@ -74,6 +74,25 @@ function App() {
             }
             return newCharacters;
         });
+    };
+
+    const [selectedClass, setSelectedClass] = useState(null);
+    const [showSelectedClass, setShowSelectedClass] = useState(true);
+    const intelligenceModifier = calculateModifier(characterAttributes['Intelligence']);
+    const totalSkillPoints = 10 + (4 * intelligenceModifier);
+    const [selectedSkill, setSelectedSkill] = useState(SKILL_LIST[0].name);
+    const [dcValue, setDcValue] = useState(0);
+    const [rolledNumber, setRolledNumber] = useState(0);
+    const [result, setResult] = useState('');
+
+    const handleSkillCheck = (characterIndex) => {
+        const randomNumber = Math.floor(Math.random() * 20) + 1;
+        const totalSkill = characters[characterIndex].skillPoints[characters[characterIndex].selectedSkill] + randomNumber;
+
+        const newCharacters = [...characters];
+        newCharacters[characterIndex].rolledNumber = randomNumber;
+        newCharacters[characterIndex].result = totalSkill >= newCharacters[characterIndex].dcValue ? 'Success' : 'Failure';
+        setCharacters(newCharacters);
     };
 
     const addCharacter = () => {
@@ -132,82 +151,124 @@ function App() {
                 </header>
 
                 {characters.map((character,index) => (
-                    <div style={{display: 'flex', justifyContent: 'space-between'}} key={index}>
+                    <div key={index} style={{backgroundColor: '#282c34', color: 'white'}}>
+                        <h1>Character {index + 1}</h1>
 
-                        {/*Character Attribute*/}
+                        {/* Skill Check */}
                         <section className="App-section">
-                            <h1>Attribute</h1>
+                            <h1>Skill Check</h1>
 
-                            {
-                                ATTRIBUTE_LIST.map((attribute) => (
-                                    <CharacterAttribute
-                                        characterIndex={index}
-                                        key={attribute}
-                                        attributeName={attribute}
-                                        attributeValue={character.attributes[attribute]}
-                                        calculateModifier={calculateModifier}
-                                        calculateTotalAttributes={calculateTotalAttributes}
-                                        onAttributeChange={onAttributeChange}
-                                    />
-                                ))
-                            }
+                            <label>
+                                Skill:
+                                <select value={characters[index].selectedSkill} onChange={(e) => {
+                                    const newCharacters = [...characters];
+                                    newCharacters[index].selectedSkill = e.target.value;
+                                    setCharacters(newCharacters);
+                                }}>
+                                    <option value="">--- Select ---</option>
+
+                                    {SKILL_LIST.map((skill) => (
+                                        <option key={skill.name} value={skill.name}>{skill.name}</option>
+                                    ))}
+                                </select>
+                            </label>
+
+                            <label>
+                                DC:
+                                <input type="number" min="0" value={characters[index].dcValue}
+                                       onChange={(e) => {
+                                           const newCharacters = [...characters];
+                                           newCharacters[index].dcValue = Number(e.target.value);
+                                           setCharacters(newCharacters);
+                                       }}/>
+                            </label>
+
+                            <button onClick={() => handleSkillCheck(index)}>Roll</button>
+
+                            <p>Skill: {characters[index].selectedSkill}</p>
+                            <p>Rolled: {characters[index].rolledNumber}</p>
+                            <p>DC: {characters[index].dcValue}</p>
+                            <p>Result: {characters[index].result}</p>
                         </section>
 
-                        {/*Character Class*/}
-                        <section className="App-section">
-                            <h1>Classes</h1>
-                            {
-                                classArray.map(({name, minAttributes}) => (
-                                    <CharacterClass
-                                        key={name}
-                                        className={name}
-                                        requirements={minAttributes}
-                                        // characterAttributes={characterAttributes}
-                                        characterAttributes={character.attributes}
-                                        onSelect={() => {
-                                            setShowSelectedClass(true);
-                                            setSelectedClass({name, minAttributes})
-                                        }}
-                                    />
-                                ))
-                            }
-                        </section>
+                        <div style={{display: 'flex', justifyContent: 'space-between'}} key={index}>
 
-                        {/* Minimum Requirement */}
-                        {showSelectedClass && selectedClass && (
+                            {/*Character Attribute*/}
                             <section className="App-section">
-                                <h2>{selectedClass.name} minimum requirement</h2>
-                                {Object.entries(selectedClass.minAttributes).map(([attribute, value]) => (
-                                    <p key={attribute}>{attribute}: {value}</p>
-                                ))}
+                                <h1>Attribute</h1>
 
-                                <button onClick={() => setShowSelectedClass(!showSelectedClass)}>
-                                    {showSelectedClass ? 'Close' : 'Show'} Requirement View
-                                </button>
+                                {
+                                    ATTRIBUTE_LIST.map((attribute) => (
+                                        <CharacterAttribute
+                                            characterIndex={index}
+                                            key={attribute}
+                                            attributeName={attribute}
+                                            attributeValue={character.attributes[attribute]}
+                                            calculateModifier={calculateModifier}
+                                            calculateTotalAttributes={calculateTotalAttributes}
+                                            onAttributeChange={onAttributeChange}
+                                        />
+                                    ))
+                                }
                             </section>
-                        )}
 
-                        {/* Skills*/}
-                        <section className="App-section">
-                            <h1>Skills</h1>
-                            <h2>Total Skill Point Availability : {totalSkillPoints}</h2>
-                            {
-                                SKILL_LIST.map((skill) => (
-                                    <CharacterSkill
-                                        key={skill.name}
-                                        characterIndex={index}
-                                        skillName={skill.name}
-                                        attributeModifier={skill.attributeModifier}
-                                        calculateModifier={calculateModifier}
-                                        characterAttributes={character.attributes}
-                                        points={character.skillPoints[skill.name]}
-                                        onIncrease={handleIncrease}
-                                        onDecrease={handleDecrease}
-                                    />
-                                ))
-                            }
-                        </section>
+                            {/*Character Class*/}
+                            <section className="App-section">
+                                <h1>Classes</h1>
+                                {
+                                    classArray.map(({name, minAttributes}) => (
+                                        <CharacterClass
+                                            key={name}
+                                            className={name}
+                                            requirements={minAttributes}
+                                            // characterAttributes={characterAttributes}
+                                            characterAttributes={character.attributes}
+                                            onSelect={() => {
+                                                setShowSelectedClass(true);
+                                                setSelectedClass({name, minAttributes})
+                                            }}
+                                        />
+                                    ))
+                                }
+                            </section>
+
+                            {/* Minimum Requirement */}
+                            {showSelectedClass && selectedClass && (
+                                <section className="App-section">
+                                    <h2>{selectedClass.name} minimum requirement</h2>
+                                    {Object.entries(selectedClass.minAttributes).map(([attribute, value]) => (
+                                        <p key={attribute}>{attribute}: {value}</p>
+                                    ))}
+
+                                    <button onClick={() => setShowSelectedClass(!showSelectedClass)}>
+                                        {showSelectedClass ? 'Close' : 'Show'} Requirement View
+                                    </button>
+                                </section>
+                            )}
+
+                            {/* Skills*/}
+                            <section className="App-section">
+                                <h1>Skills</h1>
+                                <h2>Total Skill Point Availability : {totalSkillPoints}</h2>
+                                {
+                                    SKILL_LIST.map((skill) => (
+                                        <CharacterSkill
+                                            key={skill.name}
+                                            characterIndex={index}
+                                            skillName={skill.name}
+                                            attributeModifier={skill.attributeModifier}
+                                            calculateModifier={calculateModifier}
+                                            characterAttributes={character.attributes}
+                                            points={character.skillPoints[skill.name]}
+                                            onIncrease={handleIncrease}
+                                            onDecrease={handleDecrease}
+                                        />
+                                    ))
+                                }
+                            </section>
+                        </div>
                     </div>
+
                 ))}
 
             </div>

@@ -4,9 +4,6 @@ export default function CharacterSkill({ characterIndex, skillName, attributeMod
 
     const modifier = calculateModifier(characterAttributes[attributeModifier]);
 
-    console.log('modifier', modifier);
-    console.log('points', points);
-
     return (
         <div>
             <span>{skillName} : {points} (Modifier: {attributeModifier}): {modifier}</span>
