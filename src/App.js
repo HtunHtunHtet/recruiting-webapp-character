@@ -3,6 +3,7 @@ import './App.css';
 import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from './consts.js';
 import CharacterAttribute from "./components/CharacterAttribute";
 import CharacterClass from "./components/CharacterClass";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 
 function App() {
@@ -32,67 +33,69 @@ function App() {
     const [showSelectedClass, setShowSelectedClass] = useState(true);
 
     return (
-    <div className="App">
-      <header className="App-header">
-        <h1>React Coding Exercise</h1>
-      </header>
+        <ErrorBoundary>
+            <div className="App">
+                <header className="App-header">
+                    <h1>React Coding Exercise</h1>
+                </header>
 
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between'}}>
 
-            {/*Character Attribute*/}
-            <section className="App-section">
-                <h1>Attribute</h1>
+                    {/*Character Attribute*/}
+                    <section className="App-section">
+                        <h1>Attribute</h1>
 
-                {
-                    ATTRIBUTE_LIST.map((attribute) => (
-                        <CharacterAttribute
-                            key={attribute}
-                            attributeName={attribute}
-                            attributeValue={characterAttributes[attribute]}
-                            calculateModifier={calculateModifier}
-                            calculateTotalAttributes={calculateTotalAttributes}
-                            onAttributeChange={onAttributeChange}
-                        />
-                    ))
-                }
-            </section>
+                        {
+                            ATTRIBUTE_LIST.map((attribute) => (
+                                <CharacterAttribute
+                                    key={attribute}
+                                    attributeName={attribute}
+                                    attributeValue={characterAttributes[attribute]}
+                                    calculateModifier={calculateModifier}
+                                    calculateTotalAttributes={calculateTotalAttributes}
+                                    onAttributeChange={onAttributeChange}
+                                />
+                            ))
+                        }
+                    </section>
 
-            {/*Character Class*/}
-            <section className="App-section">
-                <h1>Classes</h1>
-                {
-                    classArray.map(({name, minAttributes}) => (
-                        <CharacterClass
-                            key={name}
-                            className={name}
-                            requirements={minAttributes}
-                            characterAttributes={characterAttributes}
-                            onSelect={() => {
-                                setShowSelectedClass(true);
-                                setSelectedClass({name, minAttributes})
-                            }}
-                        />
-                    ))
-                }
-            </section>
+                    {/*Character Class*/}
+                    <section className="App-section">
+                        <h1>Classes</h1>
+                        {
+                            classArray.map(({name, minAttributes}) => (
+                                <CharacterClass
+                                    key={name}
+                                    className={name}
+                                    requirements={minAttributes}
+                                    characterAttributes={characterAttributes}
+                                    onSelect={() => {
+                                        setShowSelectedClass(true);
+                                        setSelectedClass({name, minAttributes})
+                                    }}
+                                />
+                            ))
+                        }
+                    </section>
 
-            {/* Minimum Requirement */}
-            {showSelectedClass && selectedClass && (
-                <section className="App-section">
-                    <h2>{selectedClass.name} minimum requirement</h2>
-                    {Object.entries(selectedClass.minAttributes).map(([attribute, value]) => (
-                        <p key={attribute}>{attribute}: {value}</p>
-                    ))}
+                    {/* Minimum Requirement */}
+                    {showSelectedClass && selectedClass && (
+                        <section className="App-section">
+                            <h2>{selectedClass.name} minimum requirement</h2>
+                            {Object.entries(selectedClass.minAttributes).map(([attribute, value]) => (
+                                <p key={attribute}>{attribute}: {value}</p>
+                            ))}
 
-                    <button onClick={() => setShowSelectedClass(!showSelectedClass)}>
-                        {showSelectedClass ? 'Close' : 'Show'} Requirement View
-                    </button>
-                </section>
-            )}
+                            <button onClick={() => setShowSelectedClass(!showSelectedClass)}>
+                                {showSelectedClass ? 'Close' : 'Show'} Requirement View
+                            </button>
+                        </section>
+                    )}
 
-        </div>
-    </div>
-  );
+                </div>
+            </div>
+        </ErrorBoundary>
+    );
 }
 
 export default App;
