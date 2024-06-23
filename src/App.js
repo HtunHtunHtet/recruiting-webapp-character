@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import './App.css';
 import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from './consts.js';
 import CharacterAttribute from "./components/CharacterAttribute";
@@ -14,7 +14,11 @@ function App() {
     );
 
     const onAttributeChange = (attributeName, attributeValue) => {
-        setCharacterAttributes(prev => ({...prev, [attributeName]: attributeValue}));
+        setCharacterAttributes(prev => {
+            const newAttributes = {...prev, [attributeName]: attributeValue};
+            saveCharacterData(newAttributes).catch(error => console.error('Error:', error));
+            return newAttributes;
+        });
     };
 
     const classArray = Object.entries(CLASS_LIST).map(([name, minAttributes]) => ({
@@ -49,6 +53,45 @@ function App() {
             setSkillPoints(prev => ({...prev, [skillName]: prev[skillName] - 1 }));
         }
     };
+
+    /** API Call **/
+    const API_URL = "https://recruiting.verylongdomaintotestwith.ca/api/{HtunHtunHtet}/character";
+
+    const saveCharacterData = async (data) => {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log('save character data?', response);
+    }
+
+    const loadCharacterData = async () => {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    useEffect(() => {
+        loadCharacterData()
+            .then(data => {
+                if (data.statusCode === 200) {
+                    setCharacterAttributes(data.body);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }, []);
 
     return (
         <ErrorBoundary>
@@ -124,13 +167,11 @@ function App() {
                                     characterAttributes={characterAttributes}
                                     points={skillPoints[skill.name]}
                                     onIncrease={() => handleIncrease(skill.name)}
-                                    onDecrease={() =>
-                                        handleDecrease(skill.name)}
+                                    onDecrease={() => handleDecrease(skill.name)}
                                 />
                             ))
                         }
                     </section>
-
                 </div>
             </div>
         </ErrorBoundary>
