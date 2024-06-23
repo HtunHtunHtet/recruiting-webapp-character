@@ -5,6 +5,8 @@ export default function CharacterClass({ className, requirements, characterAttri
         return characterAttributes[attribute] >= requirements[attribute];
     });
 
+    console.log('meetsRequirements', meetsRequirements);
+
     const color = meetsRequirements ? 'red' : 'white';
 
     return (

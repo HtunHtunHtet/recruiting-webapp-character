@@ -1,12 +1,14 @@
 import React from "react";
 
-export default function CharacterAttribute({ attributeName, attributeValue, calculateModifier, calculateTotalAttributes, onAttributeChange }) {
+export default function CharacterAttribute({ characterIndex, attributeName, attributeValue, calculateModifier, calculateTotalAttributes, onAttributeChange }) {
 
     const modifier = calculateModifier(attributeValue);
 
     const handleIncrease = () => {
-        if (calculateTotalAttributes() < 70) {
-            onAttributeChange(attributeName, attributeValue + 1);
+        console.log('calculateTotalAttributes', calculateTotalAttributes());
+
+        if (calculateTotalAttributes(characterIndex) < 70) {
+            onAttributeChange(characterIndex, attributeName, attributeValue + 1);
         } else {
             alert("A character can have up to 70 delegated attribute points");
         }
@@ -14,7 +16,7 @@ export default function CharacterAttribute({ attributeName, attributeValue, calc
 
     const handleDecrease = () => {
         if (attributeValue > 0) {
-            onAttributeChange(attributeName, attributeValue - 1);
+            onAttributeChange(characterIndex, attributeName, attributeValue - 1);
         }
     };
 
