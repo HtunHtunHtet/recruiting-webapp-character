@@ -4,6 +4,7 @@ import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from './consts.js';
 import CharacterAttribute from "./components/CharacterAttribute";
 import CharacterClass from "./components/CharacterClass";
 import ErrorBoundary from "./components/ErrorBoundary";
+import CharacterSkill from "./components/CharacterSkill";
 
 
 function App() {
@@ -28,9 +29,26 @@ function App() {
         return Object.values(characterAttributes).reduce((a, b) => a + b, 0);
     };
 
-    const [selectedClass, setSelectedClass] = useState(null);
+    const [skillPoints, setSkillPoints]   = useState(
+        SKILL_LIST.reduce((skills, skill) => ({...skills, [skill.name]: 0 }), {})
+    )
 
+    const [selectedClass, setSelectedClass] = useState(null);
     const [showSelectedClass, setShowSelectedClass] = useState(true);
+    const intelligenceModifier = calculateModifier(characterAttributes['Intelligence']);
+    const totalSkillPoints = 10 + (4 * intelligenceModifier);
+
+    const handleIncrease = (skillName) => {
+        if (Object.values(skillPoints).reduce((a, b) => a + b, 0) < totalSkillPoints) {
+            setSkillPoints(prev => ({...prev, [skillName]: prev[skillName] + 1 }));
+        }
+    };
+
+    const handleDecrease = (skillName) => {
+        if (skillPoints[skillName] > 0) {
+            setSkillPoints(prev => ({...prev, [skillName]: prev[skillName] - 1 }));
+        }
+    };
 
     return (
         <ErrorBoundary>
@@ -91,6 +109,27 @@ function App() {
                             </button>
                         </section>
                     )}
+
+                    {/* Skills*/}
+                    <section className="App-section">
+                        <h1>Skills</h1>
+                        <h2>Total Skill Point Availability : {totalSkillPoints}</h2>
+                        {
+                            SKILL_LIST.map((skill) => (
+                                <CharacterSkill
+                                    key={skill.name}
+                                    skillName={skill.name}
+                                    attributeModifier={skill.attributeModifier}
+                                    calculateModifier={calculateModifier}
+                                    characterAttributes={characterAttributes}
+                                    points={skillPoints[skill.name]}
+                                    onIncrease={() => handleIncrease(skill.name)}
+                                    onDecrease={() =>
+                                        handleDecrease(skill.name)}
+                                />
+                            ))
+                        }
+                    </section>
 
                 </div>
             </div>
