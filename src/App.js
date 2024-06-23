@@ -19,6 +19,14 @@ function App() {
         name, minAttributes
     }));
 
+    const calculateModifier = (attributeValue) => {
+        return Math.floor((attributeValue - 10) / 2);
+    }
+
+    const calculateTotalAttributes = () => {
+        return Object.values(characterAttributes).reduce((a, b) => a + b, 0);
+    };
+
     const [selectedClass, setSelectedClass] = useState(null);
 
     const [showSelectedClass, setShowSelectedClass] = useState(true);
@@ -41,6 +49,8 @@ function App() {
                             key={attribute}
                             attributeName={attribute}
                             attributeValue={characterAttributes[attribute]}
+                            calculateModifier={calculateModifier}
+                            calculateTotalAttributes={calculateTotalAttributes}
                             onAttributeChange={onAttributeChange}
                         />
                     ))
