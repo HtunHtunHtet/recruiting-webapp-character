@@ -21,6 +21,7 @@ function App() {
 
     const [selectedClass, setSelectedClass] = useState(null);
 
+    const [showSelectedClass, setShowSelectedClass] = useState(true);
 
     return (
     <div className="App">
@@ -57,12 +58,28 @@ function App() {
                             requirements={minAttributes}
                             characterAttributes={characterAttributes}
                             onSelect={() => {
+                                setShowSelectedClass(true);
                                 setSelectedClass({name, minAttributes})
                             }}
                         />
                     ))
                 }
             </section>
+
+            {/* Minimum Requirement */}
+            {showSelectedClass && selectedClass && (
+                <section className="App-section">
+                    <h2>{selectedClass.name} minimum requirement</h2>
+                    {Object.entries(selectedClass.minAttributes).map(([attribute, value]) => (
+                        <p key={attribute}>{attribute}: {value}</p>
+                    ))}
+
+                    <button onClick={() => setShowSelectedClass(!showSelectedClass)}>
+                        {showSelectedClass ? 'Close' : 'Show'} Requirement View
+                    </button>
+                </section>
+            )}
+
         </div>
     </div>
   );
